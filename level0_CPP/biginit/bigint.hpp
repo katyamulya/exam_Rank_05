@@ -1,8 +1,9 @@
 #ifndef BIGINT_HPP
 #define BIGINT_HPP
 
-#include <string> // for std::string and size_t
+#include <string> // for std::string
 #include <ostream> // for std::ostream 
+#include <cstddef>  // for size_t
 
 /* 3 tools (digits, zeros, convert) + 5 orthodox + getter + help_func + 18 operators + overload << = 28 */
 class bigint
@@ -33,7 +34,7 @@ class bigint
 		bigint operator+=(const bigint& other);
 
 		// Increments
-		bigint operator++();  // Pre-increment (++b)
+		bigint& operator++();  // Pre-increment (++b)
 		bigint operator++(int); // Post-increment (b++)
 
 		// Shifts with primitive numbers

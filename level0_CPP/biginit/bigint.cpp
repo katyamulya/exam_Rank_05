@@ -2,7 +2,7 @@
 
 #include <sstream>  //for std::ostringstream
 //#include <stdexcept>  // for std::invalid_argument
-#include <iostream>   // for std::cout
+#include <iostream>   // for std::ostream
 #include <cctype>   // for std::isdigit
 
 //Default Constructor
@@ -96,12 +96,16 @@ bigint bigint::operator+(const bigint& other) const
 	// Access internal strings using the reference getter
 	const std::string& num1 = this->getValue();
 	const std::string& num2 = other.getValue();
-	std::string result = "";
+	std::string reversed_result = "";
 
 	// Start tracking indices from the rightmost digits <-
 	int i = static_cast<int>(num1.size()) - 1;
 	int j = static_cast<int>(num2.size()) - 1;
 	int carry = 0;
+
+	// Pre-calculate max possible size to prevent reallocations
+	size_t max_size = (num1.size() > num2.size() ? num1.size() : num2.size()) + 1;
+	reversed_result.reserve(max_size);
 
 	// Loop until all digits are processed and no carry remains
 	while (i >= 0 || j >= 0 || carry > 0)
@@ -121,20 +125,12 @@ bigint bigint::operator+(const bigint& other) const
 		int digit = sum % 10;  // Extract the digit to save
 
 		// Append digit character to our working string
-		result += static_cast<char>(digit + '0');
+		reversed_result += static_cast<char>(digit + '0');
 	}
-
 	// Because we appended right-to-left, the string is reversed.
-    // In C++98, we reverse it back manually:
-	std::string reversed_result = "";
-	for (int k = static_cast<int>(result.size()) - 1; k >= 0; --k)
-	{
-		reversed_result += result[k];
-	}
+	std::string result(reversed_result.rbegin(), reversed_result.rend());
 
-	// Return a temporary bigint object initialized with the final string
-	return bigint(reversed_result);
-
+	return bigint(result);
 }
 
 bigint bigint::operator+=(const bigint& other)
@@ -144,9 +140,10 @@ bigint bigint::operator+=(const bigint& other)
 }
 
 // Increments
-bigint bigint::operator++()  // ++b
+bigint& bigint::operator++()  // ++b
 {
 	*this = *this + bigint(1);
+	return *this;
 }
 
 bigint bigint::operator++(int) // b++
@@ -185,10 +182,11 @@ bigint bigint::operator<<(unsigned int shift_amount) const  // b << 3 means mult
 		return *this;
 	
 	std::string new_value = this->value;
-	for (unsigned int i = 0; i < shift_amount; ++i)
-	{
-		new_value += '0';
-	}
+
+	// Reserve memory and append zeros
+	new_value.reserve(new_value.size() + shift_amount);
+	new_value.append(shift_amount, '0');
+
 	return bigint(new_value);
 }
 
@@ -235,12 +233,39 @@ bigint bigint::operator>>=(const bigint& other)
 }
 
 // Comparisons
-bool bigint::operator==(const bigint& other) const;
-bool bigint::operator!=(const bigint& other) const;
-bool bigint::operator<(const bigint& other) const;
-bool bigint::operator<=(const bigint& other) const;
-bool bigint::operator>(const bigint& other) const;
-bool bigint::operator>=(const bigint& other) const;
+bool bigint::operator==(const bigint& other) const
+{
+	return (this->getValue() == other.getValue());
+}
+
+bool bigint::operator!=(const bigint& other) const
+{
+	return !(*this == other);
+}
+
+bool bigint::operator<(const bigint& other) const
+{
+	if (this->getValue().size() != other.getValue().size())
+		return (this->getValue().size() < other.getValue().size());
+	return (this->getValue() < other.getValue());
+}
+
+bool bigint::operator<=(const bigint& other) const
+{
+	// Conceptually: "a <= b" is equivalent to "Not (b < a)"
+	return !(other < *this);
+}
+
+bool bigint::operator>(const bigint& other) const
+{
+	return (other < *this);
+}
+
+bool bigint::operator>=(const bigint& other) const
+{
+	// Conceptually: "a >= b" is equivalent to "Not (a < b)"
+	return !(*this < other);
+}
 
 // Overload << operator
 std::ostream& operator<<(std::ostream& os, const bigint& b)
