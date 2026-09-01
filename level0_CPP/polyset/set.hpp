@@ -7,6 +7,24 @@ class set
 {
 	private:
 		searchable_bag *bag;
+		set ();
+
+	public:
+		/* Orthodox Canonical Form */
+		set(searchable_bag& sbag);
+		set(const set& other);
+		set& operator=(const set& other);
+		~set();
+
+		void insert(int value);
+    	void insert(int *array, int size);
+    	void print() const;
+    	void clear();
+
+		bool has(int value) const;
+
+		searchable_bag& get_bag() const;
+		//const searchable_bag& get_bag() const;
 };
 
 #endif

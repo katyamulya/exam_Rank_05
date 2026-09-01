@@ -36,14 +36,12 @@ void tree_bag::set_tree(node *new_tree) {
 
 void tree_bag::insert(int item) {
 	node *new_node = new node;
-	// alloc new node
-	// std::cout << "create node: " << item << std::endl;
+	
 	new_node->value = item;
 	new_node->l = 0;
 	new_node->r = 0;
 
 	if (tree == 0) {
-		// std::cout << "tree is null - adding" << std::endl;
 		tree = new_node;
 	} else {
 		node *current = tree;
@@ -63,7 +61,6 @@ void tree_bag::insert(int item) {
 					current = current->r;
 				}
 			} else {
-				// std::cout << "duplicate value: delete node" << std::endl;
 				delete new_node;
 				break;
 			}
@@ -90,7 +87,6 @@ void tree_bag::clear() {
 // defined as static functions in the class
 void tree_bag::destroy_tree(node *current) {
 	if (current != 0) {
-		// std::cout << "destroying value: " << current->value << std::endl;
 		destroy_tree(current->l);
 		destroy_tree(current->r);
 		delete current;

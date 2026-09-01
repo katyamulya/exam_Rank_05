@@ -6,13 +6,14 @@
 
 class searchable_tree_bag: public tree_bag, public searchable_bag
 {
+	public:
 	/* Orthodox Canonical Form */
-	searchable_tree_bag();
-	searchable_tree_bag(const searchable_tree_bag& other);
-	searchable_tree_bag& operator=(const  searchable_tree_bag& other);
-	~searchable_tree_bag();
+		searchable_tree_bag();
+		searchable_tree_bag(const searchable_tree_bag& other);
+		searchable_tree_bag& operator=(const  searchable_tree_bag& other);
+		~searchable_tree_bag();
 
-	bool has(int value) const;
+		bool has(int value) const;
 };
 
 #endif
