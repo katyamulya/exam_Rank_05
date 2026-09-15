@@ -45,3 +45,4 @@ $> echo 'dxss' | ./a.out 3 3 2 | cat -e
 O $
 O $
 O $
+

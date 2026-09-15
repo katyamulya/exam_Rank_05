@@ -1,0 +1,46 @@
+The World
+
+The "world" is a grid of square cells. Each cell can only be in one of two states:
+🟢 Alive (represented by 1)
+🔴 Dead (represented by 0)
+Every cell interacts with its 8 immediate neighbors (up, down, left, right, and the 4 diagonals).
+
+The Rules of Nature
+
+Time moves forward in steps called generations or ticks. In every tick, the game looks at the current layout, counts the live neighbors for every single cell, and decides if that cell will live or die in the next tick using 4 rules:
+1. Underpopulation (Death)
+If a live cell has fewer than 2 live neighbors, it dies.
+Analogy: It dies of loneliness or isolation.
+2. Survival (Life goes on)
+If a live cell has exactly 2 or 3 live neighbors, it stays alive.
+Analogy: The environment is perfectly balanced.
+3. Overpopulation (Death)
+If a live cell has more than 3 live neighbors, it dies.
+Analogy: It dies due to over-crowding or starvation.
+4. Reproduction (Birth)
+If a dead cell has exactly 3 live neighbors, it becomes a live cell.
+Analogy: Three parent cells come together to create a new life.
+
+The Most Critical Rule for Coders
+
+Everything happens simultaneously.You cannot update a cell on the board and immediately use its new state to calculate its neighbor's fate. If you did, it would ruin the simulation like a domino effect.This is exactly why you need two boards in your code:
+1. Read the current states from board to calculate neighbor counts.
+2. Write the new states into new_board. 
+3. Only copy new_board back into board once the entire grid has been evaluated for that generation.
+
+
+Counting Logic
+- Use nested loops: Iterate r from -1 to 1 and c from -1 to 1 
+around the target cell (row, col).
+- Check boundaries: Ensure row + r and col + c stay within the grid dimensions 
+so you do not cause a segmentation fault.
+- Skip the center: Do not add to the neighbor count when r == 0 and c == 0.
+- Accumulate: Add 1 for every neighbor containing a live cell character (1).
+- Use a temporary map: Save the next state in a separate grid or buffer so updates 
+do not affect neighbor counts during the same evaluation step.
+
+
+Any live cell with fewer than two live neighbours dies (underpopulation).
+Any live cell with two or three live neighbours lives on to the next generation.
+Any live cell with more than three live neighbours dies (overpopulation).
+Any dead cell with exactly three live neighbours becomes a live cell (reproduction).
