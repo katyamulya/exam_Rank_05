@@ -1,4 +1,7 @@
 #include "bsq.h"
+
+// cc -Wall -Werror -Wextra bsq.c
+
 /* Initialization of structure by 0 / NULL */
 void	data_init(t_data *data)
 {
@@ -74,7 +77,7 @@ int save_count_columns(t_data *data, const char *line)
 	size_t size = ft_strlen(line);
 	if (size < 1)  // if only "\n"  ?????
 		return -1;
-	fprintf(stdout, "Columns size: %lu characters\n", (unsigned long)size);
+	//fprintf(stdout, "Columns size: %lu characters\n", (unsigned long)size);
 	data->columns = size;
 	return 0;
 }
@@ -102,10 +105,12 @@ int	parse_first_line(t_data *data, const char *line)
 	data->empty = empty;
 	data->obstacle = obstacle;
 	data->full = full;
+	/*
 	fprintf(stdout, "  Rows:     %d\n", data->rows);
     fprintf(stdout, "  Obstacle: %c\n", data->obstacle);
     fprintf(stdout, "  Empty: %c\n", data->empty);
     fprintf(stdout, "  Full: %c\n", data->full);
+	*/
 	return 0;
 }
 
@@ -246,5 +251,45 @@ int bsq(t_data *data, FILE *file)
 	}
 	print_map(data);
 	free_map(data);
+	return (0);
+}
+
+int main (int argc, char **argv)
+{
+	t_data	data;
+	int		i;
+	FILE 	*file;
+
+	if (argc > 1)
+	{
+		i = 1;
+		while (i < argc)
+		{
+			// call the key function with argv[i] as the input file
+			file = fopen(argv[i], "r");
+			if (file == NULL)
+			{
+				// fprintf(stderr, "Error opening file '%s': errno %d\n", argv[i], errno);
+				fprintf(stderr, "map error\n");
+				//continue;
+			}
+			else
+			{
+				if (bsq(&data, file) == -1)
+					fprintf(stderr, "map error\n");
+				fclose(file);
+			}
+			if (i + 1 < argc)
+				fprintf(stdout, "\n");
+			i++;
+		}
+	}
+	else
+	{
+		// call the key function with stdin as the input stream
+		//return (bsq(&data, stdin));
+		if (bsq(&data, stdin) == -1)
+			fprintf(stderr, "map error\n");
+	}
 	return (0);
 }
