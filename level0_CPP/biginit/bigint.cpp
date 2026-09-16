@@ -165,7 +165,7 @@ unsigned int bigint::bigint_to_uint(const bigint& b) const
 {
 	std::string str = b.getValue();
 	if (str.size() > 7)
-		return 9999999;  //takes 10 Mb of memory - safe size for any computer to allocate instantly
+		return 9999999;  //takes 10 Mb of memory - safe size for any computer to allocate instantly (7x9)
 	
 	unsigned int result = 0;
 	for (size_t i = 0; i < str.size(); i++)
@@ -247,13 +247,13 @@ bool bigint::operator<(const bigint& other) const
 {
 	if (this->getValue().size() != other.getValue().size())
 		return (this->getValue().size() < other.getValue().size());
-	return (this->getValue() < other.getValue());
+	return (this->getValue() < other.getValue());  // if sizes equal
 }
 
 bool bigint::operator<=(const bigint& other) const
 {
-	// Conceptually: "a <= b" is equivalent to "Not (b < a)"
-	return !(other < *this);
+	// Conceptually: "a <= b" is equivalent to "Not (b > a)"
+	return !(other > *this);
 }
 
 bool bigint::operator>(const bigint& other) const
