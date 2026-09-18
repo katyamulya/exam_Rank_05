@@ -1,10 +1,5 @@
 #include "bigint.hpp"
 
-#include <sstream>  //for std::ostringstream
-//#include <stdexcept>  // for std::invalid_argument
-#include <iostream>   // for std::ostream
-#include <cctype>   // for std::isdigit
-
 //Default Constructor
 bigint::bigint() : value("0") {}   //init value by 0
 
@@ -250,21 +245,18 @@ bool bigint::operator<(const bigint& other) const
 	return (this->getValue() < other.getValue());  // if sizes equal
 }
 
-bool bigint::operator<=(const bigint& other) const
-{
-	// Conceptually: "a <= b" is equivalent to "Not (b > a)"
-	return !(other > *this);
-}
-
 bool bigint::operator>(const bigint& other) const
 {
-	return (other < *this);
+	return !(*this < other);
 }
 
+bool bigint::operator<=(const bigint& other) const
+{
+	return (*this < other || *this == other);
+}
 bool bigint::operator>=(const bigint& other) const
 {
-	// Conceptually: "a >= b" is equivalent to "Not (a < b)"
-	return !(*this < other);
+	return (*this > other || *this == other);
 }
 
 // Overload << operator

@@ -1,6 +1,9 @@
 #include "bigint.hpp"
 #include <iostream>
 
+// c++ -Wall -Werror -Wextra -std=c++98 main.cpp bigint.cpp
+// ./a.out 
+
 int main()
 {
     const bigint a(42);
@@ -33,10 +36,16 @@ int main()
     std::cout << "(d == a) = " << (d == a) << std::endl;
     std::cout << "(d != a) = " << (d != a) << std::endl;
 
+    // extra
+	bigint x(12345678); bigint y(5);
+	std::cout << "(x << y) = " << (x << y) << ", x: " << x << ", y: " << y << std::endl;
+	std::cout << "(x >>= y) = " << (x >>= y) << ", x: " << x << ", y: " << y << std::endl;
+	std::cout << "(x >= y) = " << (x >= y) << ", x: " << x << ", y: " << y << std::endl;
+
+	std::cout << "x= " << (x <<= 5) << ", y= " << (y <<= 12) << std::endl;
+	std::cout << "(x >= y) = " << (x >= y) << ", x: " << x << ", y: " << y << std::endl;
 }
 
-// c++ -Wall -Werror -Wextra -std=c++98 main.cpp bigint.cpp
-// ./a.out 
 
 /*  RESULTS:
 

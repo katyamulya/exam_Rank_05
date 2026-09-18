@@ -3,7 +3,11 @@
 
 #include <string> // for std::string
 #include <ostream> // for std::ostream 
-#include <cstddef>  // for size_t
+//#include <cstddef>  // for size_t
+#include <sstream>  //for std::ostringstream
+//#include <stdexcept>  // for std::invalid_argument
+#include <iostream>   // for std::ostream
+#include <cctype>   // for std::isdigit
 
 /* 3 tools (digits, zeros, convert) + 5 orthodox + getter + help_func + 18 operators + overload << = 28 */
 class bigint
