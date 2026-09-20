@@ -1,5 +1,8 @@
 #include "set.hpp"
 
+// Private default constructor - prevents uninitialized usage
+//set::set() : bag(NULL) {}
+
 // 1. The ONLY way to build a set (saves the reference address into the pointer)
 set::set(searchable_bag& sbag) : bag(&sbag) {}
 // 2. Copy Constructor (copies the pointer address)
