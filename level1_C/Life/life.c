@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 		else if (c == 'x')
 			pen = !pen;
 
-		if (pen)
+		if (pen)  // true (1), false (0)
 			board[row][col] = 1;
 		//board[row][col] = pen ? 1 : 0;
 	}
