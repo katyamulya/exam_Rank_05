@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 	char c;
 	int pen = 0, col = 0, row = 0;
 	ssize_t bytes_read;
-	while ((bytes_read = read(STDIN_FILENO, &c, 1)) > 0) 
+	while ((bytes_read = read(STDIN_FILENO, &c, 1)) == 1) 
 	{
 		if (c == 'w' && row > 0)
 			row--;
