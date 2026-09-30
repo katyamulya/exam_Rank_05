@@ -1,5 +1,8 @@
 #include "set.hpp"
 
+// Private default constructor - prevents uninitialized usage
+//set::set() : bag(NULL) {}
+
 // 1. The ONLY way to build a set (saves the reference address into the pointer)
 set::set(searchable_bag& sbag) : bag(&sbag) {}
 // 2. Copy Constructor (copies the pointer address)
@@ -16,13 +19,14 @@ set::~set() {}
 
 void set::insert(int value)
 {
+	if (!bag) return;
 	// Check if it already exists using 'has'
 	if (bag->has(value) == false)
 		bag->insert(value);
 }
 void set::insert(int *array, int size)
 {
-	if(!array)
+	if(!bag || !array)
 		return;
 	for(int i = 0; i < size; i++)
 	{
@@ -31,15 +35,18 @@ void set::insert(int *array, int size)
 }
 void set::print() const
 {
-	bag->print(); // Forward print directly to the bag instance
+	if (bag)
+		bag->print(); // Forward print directly to the bag instance
 }
 void set::clear()
 {
-	bag->clear();  // Forward clear directly to the bag instance
+	if(bag)
+		bag->clear();  // Forward clear directly to the bag instance
 }
 
 bool set::has(int value) const
 {
+	if (!bag) return false;
 	return bag->has(value); // Forward has directly to the bag instance
 }
 

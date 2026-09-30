@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	char c;
 	int pen = 0, col = 0, row = 0;
 	ssize_t bytes_read;
-	while ((bytes_read = read(STDIN_FILENO, &c, 1)) > 0) 
+	while ((bytes_read = read(STDIN_FILENO, &c, 1)) == 1) 
 	{
 		if (c == 'w' && row > 0)
 			row--;
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 		else if (c == 'x')
 			pen = !pen;
 
-		if (pen)
+		if (pen)  // true (1), false (0)
 			board[row][col] = 1;
 		//board[row][col] = pen ? 1 : 0;
 	}
