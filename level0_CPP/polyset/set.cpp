@@ -5,16 +5,16 @@
 
 // 1. The ONLY way to build a set (saves the reference address into the pointer)
 set::set(searchable_bag& sbag) : bag(&sbag) {}
-// 2. Copy Constructor (copies the pointer address)
+/*
 set::set(const set& other) : bag(other.bag) {}
-// 3. Assignment Operator (rebinds the pointer address)
+
 set& set::operator=(const set& other)
 {
 	if (this != &other)
 		this->bag = other.bag;
 	return *this;
-}
-// 4. Destructor (Does NOT delete bag, as set doesn't own it)
+}*/
+//Destructor (Does NOT delete bag, as set doesn't own it)
 set::~set() {}
 
 void set::insert(int value)

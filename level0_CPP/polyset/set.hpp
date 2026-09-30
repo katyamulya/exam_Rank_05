@@ -8,12 +8,14 @@ class set
 	private:
 		searchable_bag *bag;
 		set ();
+		set(const set& other);
+		set& operator=(const set& other);
 
 	public:
 		/* Orthodox Canonical Form */
 		set(searchable_bag& sbag);
-		set(const set& other);
-		set& operator=(const set& other);
+		//set(const set& other);
+		//set& operator=(const set& other);
 		~set();
 
 		void insert(int value);
