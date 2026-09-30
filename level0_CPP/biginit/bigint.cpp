@@ -13,7 +13,7 @@ bigint::bigint(unsigned int  number)
 }
 
 //Constructor with a string parameter
-bigint::bigint(const std::string &str)
+bigint::bigint(const std::string &str) : value(str)
 {
 	//if (value.empty())
 		//throw std::invalid_argument("invalid input");  //??? or just save "0"  ???
@@ -23,7 +23,6 @@ bigint::bigint(const std::string &str)
     }
 	else
 	{
-		this->value = str;
 		check_digits();
 		//throw std::invalid_argument("invalid input");  //??? or just save "0"  ??? if not digits
 		remove_zeros();
@@ -50,7 +49,7 @@ bigint::~bigint() {}
 //Help tools:
 void bigint::check_digits()
 {
-	size_t i = 0;
+	std::size_t i = 0;
     while (i < value.size())
     {
         // If any character is not a digit (including negative signs), reset to 0
@@ -66,23 +65,33 @@ void bigint::check_digits()
 void bigint::remove_zeros()
 {
     // Find the first non-zero digit after the sign
-    size_t pos = value.find_first_not_of('0');
+    std::size_t pos = value.find_first_not_of('0');
 
    	if (pos == std::string::npos) 
 	{
         // The string consists entirely of zeros (e.g., "0000")
         value = "0";
+		return;
     } 
-    else 
-    {
-        // Strip out all leading zeros
+    // Strip out all leading zeros
+	if (pos > 0)
         value = value.substr(pos);
-    }
 }
 
 const std::string& bigint::getValue() const
 {
 	return value;
+}
+
+std::string reverse_str(const std::string& str)
+{
+	std::string res;
+	res.reserve(str.size());
+	for (std::size_t i = str.size(); i > 0; i--)
+	{
+		res.push_back(str[i - 1]);
+	}
+	return res;
 }
 
 // Addition
@@ -123,8 +132,8 @@ bigint bigint::operator+(const bigint& other) const
 		reversed_result += static_cast<char>(digit + '0');
 	}
 	// Because we appended right-to-left, the string is reversed.
-	std::string result(reversed_result.rbegin(), reversed_result.rend());
-
+	//std::string result(reversed_result.rbegin(), reversed_result.rend());  //c++98 ?
+	std::string result = reverse_str(reversed_result);
 	return bigint(result);
 }
 
@@ -156,6 +165,7 @@ bigint bigint::operator++(int) // b++
 	bigint huge_shift("999999999999999999");
 	bigint c = a << huge_shift;
 */
+/*
 unsigned int bigint::bigint_to_uint(const bigint& b) const
 {
 	std::string str = b.getValue();
@@ -168,6 +178,34 @@ unsigned int bigint::bigint_to_uint(const bigint& b) const
 		result = result * 10 + (str[i] - '0');
 	}
 	return result;
+}
+*/
+/*
+unsigned int bigint::bigint_to_uint(const bigint& b) const
+{
+	if (b.value == "0")
+		return 0;
+	if (b.value.size() > 10)
+		return UINT_MAX;
+	unsigned int res = 0;
+	for(std::size_t i = 0; i < b.value.size(); i++)
+	{
+		unsigned int digit = b.value[i] - '0';
+		if (res > (UINT_MAX - digit) / 10)
+			return UINT_MAX;
+		res = res * 10 + digit;
+	}
+	return res;
+}
+*/
+unsigned int bigint::bigint_to_uint(const bigint& b)
+{
+	std::stringstream ss(b.value);
+	unsigned int res = 0;
+
+	if (!(ss >> res))
+		return UINT_MAX;
+	return (res);
 }
 
 // Primitive Shift

@@ -2,12 +2,13 @@
 #define BIGINT_HPP
 
 #include <string> // for std::string
-#include <ostream> // for std::ostream 
+//#include <ostream> // for std::ostream 
 //#include <cstddef>  // for size_t
 #include <sstream>  //for std::ostringstream
 //#include <stdexcept>  // for std::invalid_argument
 #include <iostream>   // for std::ostream
 #include <cctype>   // for std::isdigit
+#include <climits>
 
 /* 3 tools (digits, zeros, convert) + 5 orthodox + getter + help_func + 18 operators + overload << = 28 */
 class bigint
@@ -19,7 +20,6 @@ class bigint
 		// Helper Functions
 		void check_digits();  // used in constructor
 		void remove_zeros();  // used in constructor
-		unsigned int bigint_to_uint(const bigint& b) const;  // used for shift operators
 	
 	public:
 
@@ -32,6 +32,8 @@ class bigint
 
 		// Getter
 		const std::string& getValue() const;
+
+		static unsigned int bigint_to_uint(const bigint& b);  // used for shift operators
 
 		// Addition
 		bigint operator+(const bigint& other) const;
@@ -64,5 +66,6 @@ class bigint
 
 // Overload the << operator for printing
 std::ostream& operator<<(std::ostream& os, const bigint& b);
+//std::string reverse_str(const std::string& str);
 
 #endif
