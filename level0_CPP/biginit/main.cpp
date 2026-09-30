@@ -25,7 +25,8 @@ int main()
     std::cout << "(b << 10) + 42 = " << ((b << 10) + 42) << std::endl;
     std::cout << "(d <<= 4) = " << (d <<= 4) << std::endl;
     std::cout << "(d >>= 2) = " << (d >>= (const bigint)2) << std::endl;
-
+    //d = a;
+    //d++;
     std::cout << "a =" << a << std::endl;
     std::cout << "d =" << d << std::endl;
 
@@ -37,6 +38,7 @@ int main()
     std::cout << "(d != a) = " << (d != a) << std::endl;
 
     // extra
+    std::cout << std::endl;
 	bigint x(12345678); bigint y(5);
 	std::cout << "(x << y) = " << (x << y) << ", x: " << x << ", y: " << y << std::endl;
 	std::cout << "(x >>= y) = " << (x >>= y) << ", x: " << x << ", y: " << y << std::endl;
@@ -44,6 +46,20 @@ int main()
 
 	std::cout << "x= " << (x <<= 5) << ", y= " << (y <<= 12) << std::endl;
 	std::cout << "(x >= y) = " << (x >= y) << ", x: " << x << ", y: " << y << std::endl;
+
+    // Test non subject edge cases 
+    std::cout << std::endl;
+    bigint f(0);
+    std::cout << "f = " << f << std::endl;
+    std::cout << "f << 5 = " << (f << 5) << std::endl;
+    std::cout << "f >> 5 = " << (f >> 5) << std::endl;
+    std::cout << "f >> 0 = " << (f >> 0) << std::endl;
+    std::cout << "f << 0 = " << (f << 0) << std::endl;
+	std::cout << "bigint(199) + bigint(1) = " << bigint(199) + bigint(1) << std::endl;
+    std::cout << "bigint(42) == bigint(42) = " << (bigint(42) == bigint(42)) << std::endl;
+    std::cout << "bigint(42) != bigint(42) = " << (bigint(42) != bigint(42)) << std::endl;
+    std::cout << "bigint(42) < bigint(42) = " << (bigint(42) < bigint(42)) << std::endl;
+    std::cout << "bigint(42) > bigint(42) = " << (bigint(42) > bigint(42)) << std::endl;
 }
 
 

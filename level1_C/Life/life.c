@@ -31,6 +31,20 @@ int count_neighbors(int r, int c, int height, int width, char board[height][widt
 	return count;
 }
 
+void print_board(int height, int width, char board[height][width])
+{
+	for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            if (board[row][col] == 1) {
+                putchar('0');
+            } else {
+                putchar(' ');
+            }
+        }
+        putchar('\n');
+    }
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 4)
@@ -52,7 +66,8 @@ int main(int argc, char **argv)
 			board[i][j] = 0;
 		}
 	}
-
+	print_board(height,width, board);
+	putchar('\n');
 	// Filling the board with stdin config
 	char c;
 	int pen = 0, col = 0, row = 0;
@@ -108,16 +123,7 @@ int main(int argc, char **argv)
 	}
 
     // Print the frame
-    for (row = 0; row < height; row++) {
-        for (col = 0; col < width; col++) {
-            if (board[row][col] == 1) {
-                putchar('0');
-            } else {
-                putchar(' ');
-            }
-        }
-        putchar('\n');
-    }
+    print_board(height, width, board);
 
 	return 0;
 }

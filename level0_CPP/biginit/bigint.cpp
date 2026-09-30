@@ -247,7 +247,7 @@ bool bigint::operator<(const bigint& other) const
 
 bool bigint::operator>(const bigint& other) const
 {
-	return !(*this < other);
+	return (other < *this);
 }
 
 bool bigint::operator<=(const bigint& other) const

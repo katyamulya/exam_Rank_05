@@ -32,7 +32,7 @@ vect2 vect2::operator+(const vect2& other) const
 vect2 vect2::operator-(const vect2& other) const
 {
 	vect2 result(x - other.x, y - other.y);
-	return result;  // OR just: return vect2(x + other.x, y + other.y);
+	return result;  // OR just: return vect2(x - other.x, y - other.y);
 }
 vect2 vect2::operator*(const int scalar) const
 {
