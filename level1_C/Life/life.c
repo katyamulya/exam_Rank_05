@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 			board[i][j] = 0;
 		}
 	}
-	print_board(height,width, board);
-	putchar('\n');
+	//print_board(height,width, board);
+	//putchar('\n');
 	// Filling the board with stdin config
 	char c;
 	int pen = 0, col = 0, row = 0;

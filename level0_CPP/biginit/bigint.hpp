@@ -37,7 +37,7 @@ class bigint
 
 		// Addition
 		bigint operator+(const bigint& other) const;
-		bigint operator+=(const bigint& other);
+		bigint& operator+=(const bigint& other);
 
 		// Increments
 		bigint& operator++();  // Pre-increment (++b)
@@ -46,14 +46,14 @@ class bigint
 		// Shifts with primitive numbers
 		bigint operator<<(unsigned int shift_amount) const;  // b << 3 means multiplying by 1000
 		bigint operator>>(unsigned int shift_amount) const;  // b >> 3 means division by 1000
-		bigint operator<<=(unsigned int shift_amount);
-		bigint operator>>=(unsigned int shift_amount);
+		bigint& operator<<=(unsigned int shift_amount);
+		bigint& operator>>=(unsigned int shift_amount);
 
 		// Shifts with bigint objects
 		bigint operator<<(const bigint& other) const;
 		bigint operator>>(const bigint& other) const;
-		bigint operator<<=(const bigint& other);
-		bigint operator>>=(const bigint& other);
+		bigint& operator<<=(const bigint& other);
+		bigint& operator>>=(const bigint& other);
 
 		// Comparisons
 		bool operator==(const bigint& other) const;

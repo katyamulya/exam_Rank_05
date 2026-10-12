@@ -1,5 +1,7 @@
 #include "bigint.hpp"
 
+//#include <algorithm>. //for std::reverse
+
 //Default Constructor
 bigint::bigint() : value("0") {}   //init value by 0
 
@@ -15,8 +17,6 @@ bigint::bigint(unsigned int  number)
 //Constructor with a string parameter
 bigint::bigint(const std::string &str) : value(str)
 {
-	//if (value.empty())
-		//throw std::invalid_argument("invalid input");  //??? or just save "0"  ???
 	if (str.empty()) 
 	{
         value = "0";
@@ -24,7 +24,6 @@ bigint::bigint(const std::string &str) : value(str)
 	else
 	{
 		check_digits();
-		//throw std::invalid_argument("invalid input");  //??? or just save "0"  ??? if not digits
 		remove_zeros();
 	}
 }
@@ -87,7 +86,7 @@ std::string reverse_str(const std::string& str)
 {
 	std::string res;
 	res.reserve(str.size());
-	for (std::size_t i = str.size(); i > 0; i--)
+	for (size_t i = str.size(); i > 0; i--)
 	{
 		res.push_back(str[i - 1]);
 	}
@@ -103,8 +102,8 @@ bigint bigint::operator+(const bigint& other) const
 	std::string reversed_result = "";
 
 	// Start tracking indices from the rightmost digits <-
-	int i = static_cast<int>(num1.size()) - 1;
-	int j = static_cast<int>(num2.size()) - 1;
+	size_t i = num1.size();
+	size_t j = num2.size();
 	int carry = 0;
 
 	// Pre-calculate max possible size to prevent reallocations
@@ -112,32 +111,37 @@ bigint bigint::operator+(const bigint& other) const
 	reversed_result.reserve(max_size);
 
 	// Loop until all digits are processed and no carry remains
-	while (i >= 0 || j >= 0 || carry > 0)
+	while (i > 0 || j > 0 || carry > 0)
 	{
 		int sum = carry;
-		if (i >= 0)
+		if (i > 0)
 		{
-			sum += num1[i] - '0';  // Convert character digit to integer
+			sum += num1[i - 1] - '0';  // Convert character digit to integer
 			i--;
 		}
-		if (j >= 0)
+		if (j > 0)
 		{
-			sum += num2[j] - '0';
+			sum += num2[j - 1] - '0';
 			j--;
 		}
 		carry = sum / 10;  // Calculate the next carry (0 or 1)
 		int digit = sum % 10;  // Extract the digit to save
 
 		// Append digit character to our working string
-		reversed_result += static_cast<char>(digit + '0');
+		reversed_result.push_back(static_cast<char>(digit + '0'));
 	}
 	// Because we appended right-to-left, the string is reversed.
 	//std::string result(reversed_result.rbegin(), reversed_result.rend());  //c++98 ?
 	std::string result = reverse_str(reversed_result);
 	return bigint(result);
+
+	/*//if algorithm allowed
+	std::reverse(reversed_result.begin(), reversed_result.end());
+	return bigint(reversed_result);
+	*/
 }
 
-bigint bigint::operator+=(const bigint& other)
+bigint& bigint::operator+=(const bigint& other)
 {
 	*this = *this + other;
 	return *this;
@@ -161,51 +165,16 @@ bigint bigint::operator++(int) // b++
 }
 
 // Helper Function to convert bigint to size_t
-/* If the shift value is too large or invalid, it clamps it to prevent memory crashes:
-	bigint huge_shift("999999999999999999");
-	bigint c = a << huge_shift;
-*/
-/*
-unsigned int bigint::bigint_to_uint(const bigint& b) const
-{
-	std::string str = b.getValue();
-	if (str.size() > 7)
-		return 9999999;  //takes 10 Mb of memory - safe size for any computer to allocate instantly (7x9)
-	
-	unsigned int result = 0;
-	for (size_t i = 0; i < str.size(); i++)
-	{
-		result = result * 10 + (str[i] - '0');
-	}
-	return result;
-}
-*/
-/*
-unsigned int bigint::bigint_to_uint(const bigint& b) const
-{
-	if (b.value == "0")
-		return 0;
-	if (b.value.size() > 10)
-		return UINT_MAX;
-	unsigned int res = 0;
-	for(std::size_t i = 0; i < b.value.size(); i++)
-	{
-		unsigned int digit = b.value[i] - '0';
-		if (res > (UINT_MAX - digit) / 10)
-			return UINT_MAX;
-		res = res * 10 + digit;
-	}
-	return res;
-}
-*/
 unsigned int bigint::bigint_to_uint(const bigint& b)
 {
 	std::stringstream ss(b.value);
-	unsigned int res = 0;
+	unsigned long long res = 0;
 
 	if (!(ss >> res))
 		return UINT_MAX;
-	return (res);
+	if (res > UINT_MAX)
+		return UINT_MAX;
+	return (static_cast<unsigned int>(res));
 }
 
 // Primitive Shift
@@ -232,13 +201,13 @@ bigint bigint::operator>>(unsigned int shift_amount) const  // b >> 3 means divi
 	return bigint(this->value.substr(0, this->value.size() - shift_amount));
 }
 
-bigint bigint::operator<<=(unsigned int shift_amount)
+bigint& bigint::operator<<=(unsigned int shift_amount)
 {
 	*this = *this << shift_amount;
 	return *this;
 }
 
-bigint bigint::operator>>=(unsigned int shift_amount)
+bigint& bigint::operator>>=(unsigned int shift_amount)
 {
 	*this = *this >> shift_amount;
 	return *this;
@@ -255,12 +224,12 @@ bigint bigint::operator>>(const bigint& other) const
 	return *this >> bigint_to_uint(other);
 }
 
-bigint bigint::operator<<=(const bigint& other)
+bigint& bigint::operator<<=(const bigint& other)
 {
 	return *this <<= bigint_to_uint(other);
 }
 
-bigint bigint::operator>>=(const bigint& other)
+bigint& bigint::operator>>=(const bigint& other)
 {
 	return *this >>= bigint_to_uint(other);
 }
