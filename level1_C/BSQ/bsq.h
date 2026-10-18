@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <sys/types.h>
 
 typedef struct s_data
@@ -16,11 +15,7 @@ typedef struct s_data
 	char	**map;
 } t_data;
 
-typedef struct s_bsq
-{
-	/* data */
-} t_bsq;
-
+/*
 int 	bsq(t_data *data, FILE *file);
 void	data_init(t_data *data);
 int		process_file(t_data *data, FILE *file);
@@ -31,7 +26,7 @@ void 	print_map(t_data * data);
 void 	free_map(t_data *data);
 int		solver(t_data *data);
 int		min3(int a, int b, int c);
-
+*/
 #endif
 
 /*
