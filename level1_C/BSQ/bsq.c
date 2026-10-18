@@ -105,11 +105,11 @@ static int read_map(FILE *file, t_data *data)
         line = NULL;
         cap = 0;
         len = getline(&line, &cap, file);
-        data->map[i] = line;
         //fprintf(stdout, "len = %zd\n", len);
         if (len <= 1 || line[len - 1] != '\n')
             return (0);
         line[--len] = '\0';
+		data->map[i] = line;
         if (data->columns == -1)
             data->columns = len;
         if (len != data->columns)
