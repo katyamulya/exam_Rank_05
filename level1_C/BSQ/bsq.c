@@ -202,7 +202,8 @@ int main(int argc, char **argv)
     FILE *file;
     if (argc < 2)
     {
-        process(stdin);
+        if(!process(stdin))
+            fprintf(stderr, "map error\n");
     }
     for (int i = 1; i < argc; i++)
     {
@@ -214,6 +215,8 @@ int main(int argc, char **argv)
         }
         if (!process(file))
             fprintf(stderr, "map error\n");
+        else
+            fprintf(stderr, "\n");
         fclose(file);
     }
     return 0;
