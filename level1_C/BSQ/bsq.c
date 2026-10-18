@@ -1,8 +1,230 @@
+
 #include "bsq.h"
+
+/*
+1 -> true
+0 -> false
+
+if (!smth) -> print_err
+*/
+
+static void free_map(t_data *d)
+{
+    if (!d->map)
+        return;
+    for (int i = 0; i < d->rows; i++)
+    {
+        free(d->map[i]);
+    }
+    free(d->map);
+    d->map = NULL;
+}
+
+/* Print map */
+void print_map(t_data * data)
+{
+	for (int i = 0; i < data->rows; i++)
+	{
+		fprintf(stdout, "%s", data->map[i]);
+		fprintf(stdout, "\n");
+	}
+}
+
+/* Find minimum of three */
+static int	min3(int a, int b, int c)
+{
+	if (a < b)
+	{
+		if (a < c)
+			return a;
+		else
+			return c;
+	}
+	else
+	{
+		if (b < c)
+			return b;
+		else
+			return c;
+	}
+}
+
+static int if_print(char c)
+{
+    return (c >= 32 && c <= 126);
+}
+
+//<number of lines> <empty> <obstacle> <full>
+static int parse_first_line(char *line, ssize_t len, t_data *data)
+{
+
+    if (len < 8 || line[len - 1] != '\n')
+        return (0);
+    //check spaces
+    if (line[len - 7] != ' ' || line[len - 5] != ' ' || line[len - 3] != ' ')
+        return (0);
+
+    data->empty = line[len - 6];
+    data->obstacle = line[len - 4];
+    data->full = line[len - 2];
+    if (!if_print(data->empty) || !if_print(data->obstacle) || !if_print(data->full) 
+        || data->empty == data->obstacle || data->empty == data->full || data->obstacle == data->full)
+        return (0);
+
+    data->rows = 0;
+    //convert to number
+    for (ssize_t i = 0; i < len - 7; i++)
+    {
+        if (line[i] < '0' || line[i] > '9')
+            return (0);
+        data->rows = data->rows * 10 + line[i] - '0';
+    }
+    return (data->rows > 0);
+}
+
+
+static int read_map(FILE *file, t_data *data)
+{
+    char *line = NULL;
+    size_t cap = 0;
+    ssize_t len;
+    data->map = NULL;
+
+    len = getline(&line, &cap, file);
+    if (len <= 0 || !parse_first_line(line, len, data))
+        return(free(line), 0);
+    free(line);
+
+    data->map = calloc(data->rows, sizeof(char *));
+    if (!data->map)
+        return 0;
+
+    data->columns = -1;
+    for (int i = 0; i < data->rows; i++)
+    {
+        line = NULL;
+        cap = 0;
+        len = getline(&line, &cap, file);
+        data->map[i] = line;
+        //fprintf(stdout, "len = %zd\n", len);
+        if (len <= 1 || line[len - 1] != '\n')
+            return (0);
+        line[--len] = '\0';
+        if (data->columns == -1)
+            data->columns = len;
+        if (len != data->columns)
+            return (0);
+        for (int j = 0; j < data->columns; j++)
+        {
+            //fprintf(stdout, "%c ", line[j]);
+            if (line[j] != data->empty && line[j] != data->obstacle)
+                return (0);
+        }
+    }
+
+    //trying to read one more line -> check if more lines than rows
+    line = NULL;
+    cap = 0;
+    len = getline(&line, &cap, file);
+    free(line);
+    return(len == -1);
+}
+
+static int solver(t_data *data)
+{
+    int max_size = 0;
+	int top_row = 0;
+	int left_col = 0;
+
+	int height = data->rows;
+	int width = data->columns;
+
+    int *prev = calloc(width, sizeof(int));
+    int *cur = calloc(width, sizeof(int));
+    int *tmp;
+
+    if (!prev || !cur)
+    {
+        return(free(prev), free(cur), 0);
+    }
+	
+	for (int i = 0; i < height; i++)
+	{
+		for(int j = 0; j < width; j++)
+		{
+			if(data->map[i][j] == data->obstacle)
+				cur[j] = 0;
+			else if (i == 0 || j == 0)
+				cur[j] = 1;
+			else
+				cur[j] = 1 + min3(prev[j], cur[j - 1], prev[j - 1]);
+			if (cur[j] > max_size)
+			{
+				max_size = cur[j];
+				top_row = i - cur[j] + 1;
+				left_col = j - cur[j] + 1;
+			}
+		}
+        tmp = prev;
+        prev = cur;
+        cur = tmp;
+	}
+    free(prev);
+    free(cur);
+
+	/* Filling the map */
+	for (int i = 0; i < max_size; i++)
+	{
+		for (int j = 0; j < max_size; j++)
+		{
+			data->map[top_row + i][left_col + j] = data->full;
+		}
+	}
+	return (1);
+}
+
+static int process(FILE *file)
+{
+    t_data data;
+
+    if (!read_map(file, &data))
+        return (free_map(&data), 0);
+    if (!solver(&data))
+        return (free_map(&data), 0);
+    print_map(&data);
+    free_map(&data);
+    return (1);
+}
+
+
+
+int main(int argc, char **argv)
+{
+    FILE *file;
+    if (argc < 2)
+    {
+        process(stdin);
+    }
+    for (int i = 1; i < argc; i++)
+    {
+        file = fopen(argv[i],  "r");
+        if (!file)
+        {
+            fprintf(stderr, "map error\n");
+            continue;
+        }
+        if (!process(file))
+            fprintf(stderr, "map error\n");
+        fclose(file);
+    }
+    return 0;
+}
+
+/*#include "bsq.h"
 
 // cc -Wall -Werror -Wextra bsq.c
 
-/* Initialization of structure by 0 / NULL */
+// Initialization of structure by 0 / NULL 
 void	data_init(t_data *data)
 {
 	data->rows = 0;
@@ -13,7 +235,7 @@ void	data_init(t_data *data)
 	data->map = NULL;
 }
 
-/* Free memory allocated for the map */
+// Free memory allocated for the map 
 void free_map(t_data *data)
 {
 	int i = 0;
@@ -29,7 +251,7 @@ void free_map(t_data *data)
 	data->map = NULL;
 }
 
-/* Find minimum of three */
+// Find minimum of three 
 int	min3(int a, int b, int c)
 {
 	if (a < b)
@@ -48,7 +270,7 @@ int	min3(int a, int b, int c)
 	}
 }
 
-/* Print map */
+// Print map 
 void print_map(t_data * data)
 {
 	int i = 0;
@@ -60,7 +282,7 @@ void print_map(t_data * data)
 	}
 }
 
-/* Size of line */
+//Size of line 
 size_t ft_strlen(const char *str)
 {
 	size_t len = 0;
@@ -71,7 +293,7 @@ size_t ft_strlen(const char *str)
 	return len;
 }
 
-/* count columns in second line = first map line */
+// count columns in second line = first map line 
 int save_count_columns(t_data *data, const char *line)
 {
 	size_t size = ft_strlen(line);
@@ -82,7 +304,7 @@ int save_count_columns(t_data *data, const char *line)
 	return 0;
 }
 
-/* Parsing and validation of the first line: rows, empty, obstacle, full */
+// Parsing and validation of the first line: rows, empty, obstacle, full 
 int	parse_first_line(t_data *data, const char *line)
 {
 	int		size;
@@ -91,11 +313,11 @@ int	parse_first_line(t_data *data, const char *line)
 
 	if (line == NULL)
         return -1;
-	/* 
-     * sscanf matches: an integer, a space, a char, a space, a char, a space, a char.
-     * The final ' %c' or '%c' catches trailing characters to ensure no extra data exists.
-	 * The '\n' at the end expects the newline from getline.
-     */
+	 
+     // sscanf matches: an integer, a space, a char, a space, a char, a space, a char.
+     // The final ' %c' or '%c' catches trailing characters to ensure no extra data exists.
+	 // The '\n' at the end expects the newline from getline.
+     
 	items_scanned = sscanf(line, "%d %c %c %c\n%c", &size, &empty, &obstacle, &full, &extra);
 	if (items_scanned != 4)
 		return -1;
@@ -105,16 +327,16 @@ int	parse_first_line(t_data *data, const char *line)
 	data->empty = empty;
 	data->obstacle = obstacle;
 	data->full = full;
-	/*
-	fprintf(stdout, "  Rows:     %d\n", data->rows);
-    fprintf(stdout, "  Obstacle: %c\n", data->obstacle);
-    fprintf(stdout, "  Empty: %c\n", data->empty);
-    fprintf(stdout, "  Full: %c\n", data->full);
-	*/
+	
+	//fprintf(stdout, "  Rows:     %d\n", data->rows);
+    //fprintf(stdout, "  Obstacle: %c\n", data->obstacle);
+    //fprintf(stdout, "  Empty: %c\n", data->empty);
+    //fprintf(stdout, "  Full: %c\n", data->full);
+	
 	return 0;
 }
 
-/* Parsing and validation of the map line*/
+// Parsing and validation of the map line
 int parse_line(t_data *data, const char *line, int row)
 {
 	int len = ft_strlen(line);
@@ -133,14 +355,14 @@ int parse_line(t_data *data, const char *line, int row)
 	return 0;
 }
 
-/* Key function to process the file/map */
+// Key function to process the file/map 
 int	process_file(t_data *data, FILE *file)
 {
 	char 	*line = NULL;
 	size_t 	len = 0;
 	ssize_t read;
 
-	/* 1. Read and process the first line if it exists */
+	// 1. Read and process the first line if it exists 
 	if ((read = getline(&line, &len, file)) != -1)
 	{
 		if (parse_first_line(data, line) == -1)
@@ -152,7 +374,7 @@ int	process_file(t_data *data, FILE *file)
 	}
 	//free(line);
 
-	/* 2. Allocation memory */
+	// 2. Allocation memory
 	data->map = calloc(data->rows, sizeof(char *));
 	if (data->map == NULL)
 	{
@@ -160,7 +382,7 @@ int	process_file(t_data *data, FILE *file)
 		return (-1);
 	}
 
-	/* 3. Read and process map lines if they exist */
+	// 3. Read and process map lines if they exist 
 	for (int i = 0; i < data->rows; i++)
 	{
 		if ((read = getline(&line, &len, file)) != -1)
@@ -178,7 +400,7 @@ int	process_file(t_data *data, FILE *file)
 		//free(line);
 	}
 
-    /* 5. Clean up resources */
+    // 5. Clean up resources 
     free(line);
     return 0;
 }
@@ -221,7 +443,7 @@ int	solver(t_data *data)
 	}
 	if (max_size <= 0)
 		return 0;
-	/* Filling the map */
+	// Filling the map
 	i = 0;
 	while (i < max_size)
 	{
@@ -292,4 +514,4 @@ int main (int argc, char **argv)
 			fprintf(stderr, "map error\n");
 	}
 	return (0);
-}
+}*/
