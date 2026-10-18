@@ -116,7 +116,6 @@ static int read_map(FILE *file, t_data *data)
             return (0);
         for (int j = 0; j < data->columns; j++)
         {
-            //fprintf(stdout, "%c ", line[j]);
             if (line[j] != data->empty && line[j] != data->obstacle)
                 return (0);
         }
