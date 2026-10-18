@@ -21,7 +21,7 @@ static void free_map(t_data *d)
 }
 
 /* Print map */
-void print_map(t_data * data)
+static void print_map(t_data * data)
 {
 	for (int i = 0; i < data->rows; i++)
 	{
