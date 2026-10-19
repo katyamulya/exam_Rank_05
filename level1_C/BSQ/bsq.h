@@ -8,9 +8,9 @@
 typedef struct s_data
 {
 	int		rows;
-	int		columns;
+	int		cols;
 	char	empty;
-	char	obstacle;
+	char	obst;
 	char	full;
 	char	**map;
 } t_data;

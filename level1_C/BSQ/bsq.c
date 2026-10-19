@@ -8,6 +8,7 @@
 if (!smth) -> print_err
 */
 
+/* Free map */
 static void free_map(t_data *d)
 {
     if (!d->map)
@@ -49,6 +50,7 @@ static int	min3(int a, int b, int c)
 	}
 }
 
+/* if character is printable */
 static int if_print(char c)
 {
     return (c >= 32 && c <= 126);
@@ -57,76 +59,68 @@ static int if_print(char c)
 //<number of lines> <empty> <obstacle> <full>
 static int parse_first_line(char *line, ssize_t len, t_data *data)
 {
-
-    if (len < 8 || line[len - 1] != '\n')
-        return (0);
-    //check spaces
-    if (line[len - 7] != ' ' || line[len - 5] != ' ' || line[len - 3] != ' ')
-        return (0);
-
-    data->empty = line[len - 6];
-    data->obstacle = line[len - 4];
-    data->full = line[len - 2];
-    if (!if_print(data->empty) || !if_print(data->obstacle) || !if_print(data->full) 
-        || data->empty == data->obstacle || data->empty == data->full || data->obstacle == data->full)
-        return (0);
-
-    data->rows = 0;
-    //convert to number
-    for (ssize_t i = 0; i < len - 7; i++)
-    {
-        if (line[i] < '0' || line[i] > '9')
-            return (0);
-        data->rows = data->rows * 10 + line[i] - '0';
-    }
-    return (data->rows > 0);
+	if (len < 8 || line[len -1] != '\n')
+		return(0);
+	if (line[len - 7] != ' ' || line[len - 5] != ' ' || line[len - 3] != ' ')
+		return (0);
+	data->empty = line[len - 6];
+	data->obst = line[len - 4];
+	data->full = line[len - 2];
+	if (!if_print(data->empty) || !if_print(data->obst) || !if_print(data->full)
+					|| data->empty == data->obst || data->empty == data->full || data->obst == data->full)
+		return (0);
+	data->rows = 0;
+	for (int i = 0; i < len - 7; i++)
+	{
+		if (line[i] < '0' || line[i] > '9')
+			return (0);
+		data->rows = data->rows * 10 + line[i] - '0';
+	}
+	return (data->rows > 0);
 }
 
 
-static int read_map(FILE *file, t_data *data)
+static int read_file(FILE *file, t_data *data)
 {
-    char *line = NULL;
-    size_t cap = 0;
-    ssize_t len;
-    data->map = NULL;
+	char *line = NULL;
+	size_t cap = 0;
+	ssize_t len;
+	data->map = NULL;
 
-    len = getline(&line, &cap, file);
-    if (len <= 0 || !parse_first_line(line, len, data))
-        return(free(line), 0);
-    free(line);
+	len = getline(&line, &cap, file);
+	if (len <= 0 || !parse_first_line(line, len, data))
+		return (free(line), 0);
+	free(line);
 
-    data->map = calloc(data->rows, sizeof(char *));
-    if (!data->map)
-        return 0;
+	data->map = calloc(data->rows, sizeof(char *));
+	if (!data->map)
+		return (0);
 
-    data->columns = -1;
-    for (int i = 0; i < data->rows; i++)
-    {
-        line = NULL;
-        cap = 0;
-        len = getline(&line, &cap, file);
-        //fprintf(stdout, "len = %zd\n", len);
-        if (len <= 1 || line[len - 1] != '\n')
-            return (0);
-        line[--len] = '\0';
+	data->cols = -1;
+	for (int i = 0; i < data->rows; i++)
+	{
+		line = NULL;
+		cap = 0;
+		len = getline(&line, &cap, file);
+		if (len <= 1 || line[len - 1] != '\n')
+			return (0);
+		line[--len] = '\0';
 		data->map[i] = line;
-        if (data->columns == -1)
-            data->columns = len;
-        if (len != data->columns)
-            return (0);
-        for (int j = 0; j < data->columns; j++)
-        {
-            if (line[j] != data->empty && line[j] != data->obstacle)
-                return (0);
-        }
-    }
-
-    //trying to read one more line -> check if more lines than rows
-    line = NULL;
-    cap = 0;
-    len = getline(&line, &cap, file);
-    free(line);
-    return(len == -1);
+		if (data->cols == -1)
+			data->cols = len;
+		if (len != data->cols)
+			return (0);
+		for (int j = 0; j < len; j++)
+		{
+			if (line[j] != data->empty && line[j] != data->obst)
+				return (0);
+		}
+	}
+	line = NULL;
+	cap = 0;
+	len = getline(&line, &cap, file);
+	free(line);
+	return (len == -1);
 }
 
 static int solver(t_data *data)
@@ -135,11 +129,9 @@ static int solver(t_data *data)
 	int top_row = 0;
 	int left_col = 0;
 
-	int height = data->rows;
-	int width = data->columns;
 
-    int *prev = calloc(width, sizeof(int));
-    int *cur = calloc(width, sizeof(int));
+    int *prev = calloc(data->cols, sizeof(int));
+    int *cur = calloc(data->cols, sizeof(int));
     int *tmp;
 
     if (!prev || !cur)
@@ -147,11 +139,11 @@ static int solver(t_data *data)
         return(free(prev), free(cur), 0);
     }
 	
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < data->rows; i++)
 	{
-		for(int j = 0; j < width; j++)
+		for(int j = 0; j < data->cols; j++)
 		{
-			if(data->map[i][j] == data->obstacle)
+			if(data->map[i][j] == data->obst)
 				cur[j] = 0;
 			else if (i == 0 || j == 0)
 				cur[j] = 1;
@@ -184,42 +176,44 @@ static int solver(t_data *data)
 
 static int process(FILE *file)
 {
-    t_data data;
+	t_data data;
 
-    if (!read_map(file, &data))
-        return (free_map(&data), 0);
-    if (!solver(&data))
-        return (free_map(&data), 0);
-    print_map(&data);
-    free_map(&data);
-    return (1);
+	if (!read_file(file, &data))
+		return(free_map(&data), 0);
+	if (!solver(&data))
+		return(free_map(&data), 0);
+	print_map(&data);
+	free_map(&data);
+	return 1;
 }
-
 
 
 int main(int argc, char **argv)
 {
-    FILE *file;
-    if (argc < 2)
-    {
-        if(!process(stdin))
-            fprintf(stderr, "map error\n");
-    }
-    for (int i = 1; i < argc; i++)
-    {
-        file = fopen(argv[i],  "r");
-        if (!file)
-        {
-            fprintf(stderr, "map error\n");
-            continue;
-        }
-        if (!process(file))
-            fprintf(stderr, "map error\n");
-        else
-            fprintf(stderr, "\n");
-        fclose(file);
-    }
-    return 0;
+	FILE *file;
+
+	if (argc < 2)
+	{
+		if (!process(stdin))
+			fprintf(stderr, "map error\n");
+	}
+	for (int i = 1; i < argc; i++)
+	{
+		file = fopen(argv[i], "r");
+		if (!file)
+		{
+			fprintf(stderr, "map error\n");
+			if (argc > 2)
+				fprintf(stdout, "\n");
+			continue;
+		}
+		if (!process(file))
+			fprintf(stderr, "map error\n");
+		if (argc > 2)
+				fprintf(stdout, "\n");
+		fclose(file);
+	}
+	return (0);
 }
 
 /*#include "bsq.h"
