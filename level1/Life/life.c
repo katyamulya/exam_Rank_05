@@ -4,7 +4,7 @@
 
 // cc -Wall -Werror -Wextra life.c
 
-int count_neighbors(int r, int c, int height, int width, char board[height][width])
+static int count_neighbors(int r, int c, int height, int width, char board[height][width])
 {
 	int count = 0;
 	for (int i = -1; i <= 1; i++)
@@ -21,17 +21,15 @@ int count_neighbors(int r, int c, int height, int width, char board[height][widt
             // Boundary check: ensure the neighbor is inside the grid
             if (neighbor_r >= 0 && neighbor_r < height && neighbor_c >= 0 && neighbor_c < width) 
 			{
-                if (board[neighbor_r][neighbor_c] == 1) // if neighbour alive?
-				{
+                if (board[neighbor_r][neighbor_c] == 1) // if neighbour alive
                     count++;
-                }
 			}
 		}
 	}
 	return count;
 }
 
-void print_board(int height, int width, char board[height][width])
+static void print_board(int height, int width, char board[height][width])
 {
 	for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
@@ -55,34 +53,28 @@ int main(int argc, char **argv)
 	if (width <= 0 || height <= 0 || iterations < 0)
 		return 1;
 
-	char board[height][width];
-	char new_board[height][width];
+	char (*board)[width] = calloc(height, sizeof(*board));
+	char (*new_board)[width] = calloc(height, sizeof(*new_board));
+	char (*tmp)[width];
+	if (!board || !new_board)
+		return (free(board), free(new_board), 1);
 
-	// Filling the board with empty cells
-	for (int i = 0; i < height; i++)
-	{
-		for (int j = 0; j < width; j++)
-		{
-			board[i][j] = 0;
-		}
-	}
-	//print_board(height,width, board);
-	//putchar('\n');
 	// Filling the board with stdin config
-	char c;
+	// w a s d -> up, left, bottom, right; x - pen
+	char ch;
 	int pen = 0, col = 0, row = 0;
 	ssize_t bytes_read;
-	while ((bytes_read = read(STDIN_FILENO, &c, 1)) == 1) 
+	while ((bytes_read = read(STDIN_FILENO, &ch, 1)) == 1) 
 	{
-		if (c == 'w' && row > 0)
+		if (ch == 'w' && row > 0)
 			row--;
-		else if (c == 's' && row < height - 1)
+		else if (ch == 's' && row < height - 1)
 			row++;
-		else if (c == 'a' && col > 0)
+		else if (ch == 'a' && col > 0)
 			col--;
-		else if (c == 'd' && col < width - 1)
+		else if (ch == 'd' && col < width - 1)
 			col++;
-		else if (c == 'x')
+		else if (ch == 'x')
 			pen = !pen;
 
 		if (pen)  // true (1), false (0)
@@ -90,12 +82,12 @@ int main(int argc, char **argv)
 		//board[row][col] = pen ? 1 : 0;
 	}
 	if (bytes_read == -1)
-		return 1;
+		return (free(board), free(new_board), 1);
 
 	// Simulating a game of life on the board
 	for (int i = 0; i < iterations; i++)
 	{
-		for (row = 0; row < height; row ++)
+		for (row = 0; row < height; row++)
 		{
 			for (col = 0; col < width; col++)
 			{
@@ -113,17 +105,16 @@ int main(int argc, char **argv)
 			}
 		}
 		// Store the state of the last iteration, befor moving to the next
-		for (int r = 0; r < height; r++) 
-		{
-        	for (int c = 0; c < width; c++) 
-			{
-            	board[r][c] = new_board[r][c];
-        	}
-		}
+		tmp = board;
+		board = new_board;
+		new_board = tmp;
 	}
 
     // Print the frame
     print_board(height, width, board);
+
+	free(board);
+	free(new_board);
 
 	return 0;
 }

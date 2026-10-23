@@ -15,18 +15,6 @@ typedef struct s_data
 	char	**map;
 } t_data;
 
-/*
-int 	bsq(t_data *data, FILE *file);
-void	data_init(t_data *data);
-int		process_file(t_data *data, FILE *file);
-int		parse_first_line(t_data *data, const char *line);
-int		parse_line(t_data *data, const char *line, int row);
-int		save_count_columns(t_data *data, const char *line);
-void 	print_map(t_data * data);
-void 	free_map(t_data *data);
-int		solver(t_data *data);
-int		min3(int a, int b, int c);
-*/
 #endif
 
 /*
